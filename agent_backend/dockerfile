@@ -1,0 +1,8 @@
+FROM ubuntu:20.04
+
+MAINTAINER tcneko <tcneko@outlook.com>
+
+COPY src /src
+RUN /bin/bash /src/docker_build.sh
+
+ENTRYPOINT [ "python3", "-m", "uvicorn", "global_scan_agent:app" ]
