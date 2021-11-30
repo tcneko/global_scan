@@ -359,13 +359,13 @@ class ScanOutCanvas extends React.Component {
         </div>
         <div className="block">
           <div className="columns">
-            <div className="column">
+            <div className="column py-2">
               <button className="button is-white">
                 <b>Prefix</b>
               </button>
             </div>
             {render_step_list.map((step) => (
-              <div className="column" key={"th_step_" + step}>
+              <div className="column py-2" key={"th_step_" + step}>
                 <button className="button is-white">
                   <b>{"Step " + (step + 1)}</b>
                 </button>
@@ -374,13 +374,13 @@ class ScanOutCanvas extends React.Component {
           </div>
           {Object.keys(render_scan_out).map((prefix) => (
             <div key={prefix} className="columns">
-              <div className="column">
+              <div className="column py-2">
                 <button className="button is-white">{prefix}</button>
               </div>
               {render_step_list.map((step) => (
                 <div
                   key={"tr_prefix" + prefix + "_step_" + step}
-                  className="column"
+                  className="column py-2"
                 >
                   <button
                     className={
@@ -430,38 +430,38 @@ class ScanOutDetailCanvas extends React.Component {
               <table className="table is-fullwidth">
                 <thead>
                   <tr>
-                    <th>Key</th>
-                    <th>Value</th>
+                    <th className="py-2">Key</th>
+                    <th className="py-2">Value</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Scanner</td>
-                    <td>{render_data_flag ? this.props.render_scanner : ""}</td>
+                    <td className="py-2">Scanner</td>
+                    <td className="py-2">{render_data_flag ? this.props.render_scanner : ""}</td>
                   </tr>
                   <tr>
-                    <td>Prefix</td>
-                    <td>{render_data_flag ? this.props.render_prefix : ""}</td>
+                    <td className="py-2">Prefix</td>
+                    <td className="py-2">{render_data_flag ? this.props.render_prefix : ""}</td>
                   </tr>
                   <tr>
-                    <td>Step</td>
-                    <td>
+                    <td className="py-2">Step</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? Number(this.props.render_step) + 1
                         : ""}
                     </td>
                   </tr>
                   <tr>
-                    <td>Alive address number</td>
-                    <td>
+                    <td className="py-2">Alive address number</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.alive_addr_count
                         : ""}
                     </td>
                   </tr>
                   <tr>
-                    <td>New Alive address</td>
-                    <td>
+                    <td className="py-2">New Alive address</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.alive_addr_diff_list.map(
                             (alive_addr) => <p key={alive_addr}>{alive_addr}</p>
@@ -470,16 +470,16 @@ class ScanOutDetailCanvas extends React.Component {
                     </td>
                   </tr>
                   <tr>
-                    <td>Dead address number</td>
-                    <td>
+                    <td className="py-2">Dead address number</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.dead_addr_count
                         : ""}
                     </td>
                   </tr>
                   <tr>
-                    <td>New Dead address</td>
-                    <td>
+                    <td className="py-2">New Dead address</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.dead_addr_diff_list.map(
                             (dead_addr) => <p key={dead_addr}>{dead_addr}</p>
@@ -488,16 +488,16 @@ class ScanOutDetailCanvas extends React.Component {
                     </td>
                   </tr>
                   <tr>
-                    <td>Average RRT</td>
-                    <td>
+                    <td className="py-2">Average RRT</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.avg_rrt + "ms"
                         : ""}
                     </td>
                   </tr>
                   <tr>
-                    <td>Average RRT change</td>
-                    <td>
+                    <td className="py-2">Average RRT change</td>
+                    <td className="py-2">
                       {render_data_flag
                         ? render_scan_step_out.avg_rrt_diff + "ms"
                         : ""}
@@ -745,7 +745,7 @@ class GlobalScan extends React.Component {
   }
 
   proc_scanner_step_out(scanner_step_out) {
-    console.log(scanner_step_out);
+    // console.log(scanner_step_out);
     let scanner = scanner_step_out.scanner;
     let step_id = scanner_step_out.step_id;
     let scan_step_out = scanner_step_out.scan_step_out;
@@ -771,7 +771,7 @@ class GlobalScan extends React.Component {
     let ws = new WebSocket(
       this.state.ws_protocol + "://" + window.location.host + "/ws/v1/task"
     );
-    console.log(task_info);
+    // console.log(task_info);
     ws.addEventListener("open", () =>
       ws.send(
         JSON.stringify({
@@ -781,7 +781,7 @@ class GlobalScan extends React.Component {
       )
     );
     ws.addEventListener("message", (event) => {
-      console.log(event.data);
+      // console.log(event.data);
       let message = JSON.parse(event.data);
       switch (message.event) {
         case "task_start":

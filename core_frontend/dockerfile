@@ -1,0 +1,17 @@
+FROM node:17-alpine as s1
+
+WORKDIR /root
+RUN npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/preset-react
+COPY src/ /root/src/
+RUN npx babel /root/src --out-dir /root/dst --presets @babel/preset-react \
+  && cp /root/src/global_scan.html /root/dst/
+
+
+FROM caddy:2.4.6-alpine as s2
+
+MAINTAINER tcneko <tcneko@outlook.com>
+
+WORKDIR /root
+COPY --from=s1 /root/dst/ /root/global_scan/
+COPY static/ /root/global_scan/static/
+COPY etc/caddy/Caddyfile /etc/caddy/

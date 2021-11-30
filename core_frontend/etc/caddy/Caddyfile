@@ -1,0 +1,11 @@
+{
+  admin off
+}
+
+:5917 {
+  rewrite /favicon.ico /static/favicon.ico
+  file_server * {
+    root /root/global_scan
+    index global_scan.html
+  }
+}

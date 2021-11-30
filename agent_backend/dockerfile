@@ -2,7 +2,11 @@ FROM ubuntu:20.04
 
 MAINTAINER tcneko <tcneko@outlook.com>
 
-COPY src /src
-RUN /bin/bash /src/docker_build.sh
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 python3-pip fping \
+  && apt-get clean
+RUN python3 -m pip --no-cache-dir install aiohttp ipaddress fastapi pydantic apscheduler uvicorn[standard]
+COPY src/ /root/global_scan/
+WORKDIR /root/global_scan
 
 ENTRYPOINT [ "python3", "-m", "uvicorn", "global_scan_agent:app" ]
