@@ -18,7 +18,7 @@ class PrefixInput extends React.Component {
             rows="20"
             autoComplete="off"
             placeholder="192.168.0.0/24"
-            value={this.props.prefix_list.join("\n")}
+            value={this.props.prefix_list_input.join("\n")}
             onChange={this.props.handle_change}
           ></textarea>
         </div>
@@ -47,7 +47,7 @@ class ScannerInput extends React.Component {
             rows="20"
             autoComplete="off"
             placeholder={this.props.agent_list.join("\n")}
-            value={this.props.scanner_list.join("\n")}
+            value={this.props.scanner_list_input.join("\n")}
             onChange={this.props.handle_change}
           ></textarea>
         </div>
@@ -72,7 +72,7 @@ class RepeatInput extends React.Component {
               (this.props.task_arg_validity_map.repeat ? "" : " is-danger")
             }
             placeholder="100"
-            value={this.props.repeat}
+            value={this.props.repeat_input}
             onChange={this.props.handle_change}
           ></input>
         </div>
@@ -100,7 +100,7 @@ class IntervalInput extends React.Component {
               (this.props.task_arg_validity_map.interval ? "" : " is-danger")
             }
             placeholder="60"
-            value={this.props.interval}
+            value={this.props.interval_input}
             onChange={this.props.handle_change}
           ></input>
         </div>
@@ -140,7 +140,7 @@ class ScanCreator extends React.Component {
               <div className="column is-half">
                 <ScannerInput
                   handle_change={this.props.handle_change}
-                  scanner_list={this.props.scanner_list}
+                  scanner_list_input={this.props.scanner_list_input}
                   agent_list={this.props.agent_list}
                   task_arg_validity_map={this.props.task_arg_validity_map}
                 />
@@ -148,7 +148,7 @@ class ScanCreator extends React.Component {
               <div className="column is-half">
                 <PrefixInput
                   handle_change={this.props.handle_change}
-                  prefix_list={this.props.prefix_list}
+                  prefix_list_input={this.props.prefix_list_input}
                   task_arg_validity_map={this.props.task_arg_validity_map}
                 />
               </div>
@@ -159,14 +159,14 @@ class ScanCreator extends React.Component {
               <div className="column is-one-quarter">
                 <RepeatInput
                   handle_change={this.props.handle_change}
-                  repeat={this.props.repeat}
+                  repeat_input={this.props.repeat_input}
                   task_arg_validity_map={this.props.task_arg_validity_map}
                 />
               </div>
               <div className="column is-one-quarter">
                 <IntervalInput
                   handle_change={this.props.handle_change}
-                  interval={this.props.interval}
+                  interval_input={this.props.interval_input}
                   task_arg_validity_map={this.props.task_arg_validity_map}
                 />
               </div>
@@ -627,6 +627,10 @@ class GlobalScan extends React.Component {
     this.state = {
       agent_list: [],
       ws_protocol: "wss",
+      scanner_list_input: [],
+      prefix_list_input: [],
+      repeat_input: 10,
+      interval_input: 60,
       scanner_list: [],
       prefix_list: [],
       repeat: 10,
@@ -659,7 +663,7 @@ class GlobalScan extends React.Component {
     switch (event.target.name) {
       case "scanner_list_input":
         this.setState({
-          scanner_list: event.target.value.split("\n"),
+          scanner_list_input: event.target.value.split("\n"),
           task_arg_validity_map: this.state.task_arg_validity_map.scanner_list
             ? this.state.task_arg_validity_map
             : { ...this.state.task_arg_validity_map, scanner_list: true },
@@ -667,7 +671,7 @@ class GlobalScan extends React.Component {
         break;
       case "prefix_list_input":
         this.setState({
-          prefix_list: event.target.value.split("\n"),
+          prefix_list_input: event.target.value.split("\n"),
           task_arg_validity_map: this.state.task_arg_validity_map.prefix_list
             ? this.state.task_arg_validity_map
             : { ...this.state.task_arg_validity_map, prefix_list: true },
@@ -675,7 +679,7 @@ class GlobalScan extends React.Component {
         break;
       case "repeat_input":
         this.setState({
-          repeat: event.target.value,
+          repeat_input: event.target.value,
           task_arg_validity_map: this.state.task_arg_validity_map.repeat
             ? this.state.task_arg_validity_map
             : { ...this.state.task_arg_validity_map, repeat: true },
@@ -683,7 +687,7 @@ class GlobalScan extends React.Component {
         break;
       case "interval_input":
         this.setState({
-          interval: event.target.value,
+          interval_input: event.target.value,
           task_arg_validity_map: this.state.task_arg_validity_map.interval
             ? this.state.task_arg_validity_map
             : { ...this.state.task_arg_validity_map, interval: true },
@@ -745,7 +749,7 @@ class GlobalScan extends React.Component {
       let json_response = await response.json();
       this.setState({
         agent_list: json_response,
-        scanner_list: json_response.sort().map((scanner) => "# " + scanner),
+        scanner_list_input: json_response.sort().map((scanner) => "# " + scanner),
       });
     } catch (error) {
       this.setState({ agent_list: [] });
@@ -771,10 +775,10 @@ class GlobalScan extends React.Component {
 
   scan_task() {
     let task_info = {
-      scanner_list: this.state.scanner_list.map((scanner) => scanner.trim()),
-      prefix_list: this.state.prefix_list,
-      repeat: Number(this.state.repeat),
-      interval: Number(this.state.interval),
+      scanner_list: this.state.scanner_list_input.map((scanner) => scanner.trim()),
+      prefix_list: this.state.prefix_list_input,
+      repeat: Number(this.state.repeat_input),
+      interval: Number(this.state.interval_input),
     };
     let ws = new WebSocket(
       this.state.ws_protocol + "://" + window.location.host + "/ws/v1/task"
@@ -880,10 +884,10 @@ class GlobalScan extends React.Component {
         <ScanCreator
           handle_change={this.handle_change}
           handle_click={this.handle_click}
-          scanner_list={this.state.scanner_list}
-          prefix_list={this.state.prefix_list}
-          repeat={this.state.repeat}
-          interval={this.state.interval}
+          scanner_list_input={this.state.scanner_list_input}
+          prefix_list_input={this.state.prefix_list_input}
+          repeat_input={this.state.repeat_input}
+          interval_input={this.state.interval_input}
           agent_list={this.state.agent_list}
           task_arg_validity_map={this.state.task_arg_validity_map}
           ui_mode={this.state.ui_mode}
