@@ -15,7 +15,7 @@ class PrefixInput extends React.Component {
               "textarea" +
               (this.props.task_arg_validity_map.prefix_list ? "" : " is-danger")
             }
-            rows="15"
+            rows="20"
             autoComplete="off"
             placeholder="192.168.0.0/24"
             value={this.props.prefix_list.join("\n")}
@@ -44,7 +44,7 @@ class ScannerInput extends React.Component {
                 ? ""
                 : " is-danger")
             }
-            rows="6"
+            rows="20"
             autoComplete="off"
             placeholder={this.props.agent_list.join("\n")}
             value={this.props.scanner_list.join("\n")}
@@ -136,19 +136,23 @@ class ScanCreator extends React.Component {
       return (
         <div className="container">
           <div className="block pt-5">
-            <ScannerInput
-              handle_change={this.props.handle_change}
-              scanner_list={this.props.scanner_list}
-              agent_list={this.props.agent_list}
-              task_arg_validity_map={this.props.task_arg_validity_map}
-            />
-          </div>
-          <div className="block pt-5">
-            <PrefixInput
-              handle_change={this.props.handle_change}
-              prefix_list={this.props.prefix_list}
-              task_arg_validity_map={this.props.task_arg_validity_map}
-            />
+            <div className="columns">
+              <div className="column is-half">
+                <ScannerInput
+                  handle_change={this.props.handle_change}
+                  scanner_list={this.props.scanner_list}
+                  agent_list={this.props.agent_list}
+                  task_arg_validity_map={this.props.task_arg_validity_map}
+                />
+              </div>
+              <div className="column is-half">
+                <PrefixInput
+                  handle_change={this.props.handle_change}
+                  prefix_list={this.props.prefix_list}
+                  task_arg_validity_map={this.props.task_arg_validity_map}
+                />
+              </div>
+            </div>
           </div>
           <div className="block pt-5">
             <div className="columns">
@@ -437,11 +441,15 @@ class ScanOutDetailCanvas extends React.Component {
                 <tbody>
                   <tr>
                     <td className="py-2">Scanner</td>
-                    <td className="py-2">{render_data_flag ? this.props.render_scanner : ""}</td>
+                    <td className="py-2">
+                      {render_data_flag ? this.props.render_scanner : ""}
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-2">Prefix</td>
-                    <td className="py-2">{render_data_flag ? this.props.render_prefix : ""}</td>
+                    <td className="py-2">
+                      {render_data_flag ? this.props.render_prefix : ""}
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-2">Step</td>
