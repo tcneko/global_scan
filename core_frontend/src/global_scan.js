@@ -1,11 +1,73 @@
 "use strict";
 
+class NavBar extends React.Component {
+  render() {
+    return (
+      <nav
+        className="navbar has-shadow"
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div className="container">
+          <div className="navbar-brand">
+            <a className="navbar-item">
+              <img src="static/logo.png" className="navbar_img" />
+            </a>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+}
+
+class TabBar extends React.Component {
+  decide_tab_active(tab_name) {
+    if (this.props.ui_tab == tab_name) {
+      return "is-active";
+    }
+    return "";
+  }
+
+  render() {
+    return (
+      <div className="container">
+        <div className="block pt-4">
+          <div className="tabs is-boxed">
+            <ul>
+              <li className={this.decide_tab_active("scan")}>
+                <a name="scan_tab" onClick={this.props.handle_click}>
+                  <span className="icon is-small">
+                    <i className="fas fa-circle-notch"></i>
+                  </span>
+                  <span>Scan</span>
+                </a>
+              </li>
+              <li className={this.decide_tab_active("reduce")}>
+                <a name="reduce_tab" onClick={this.props.handle_click}>
+                  <span className="icon is-small">
+                    <i className="fas fa-seedling"></i>
+                  </span>
+                  <span>Reduce</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 class PrefixInput extends React.Component {
   render() {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">Scan Networks</label>
+          <label className="title is-6 block">Scan Networks</label>
+          <label className="subtitle is-6 block">
+            &nbsp;(&nbsp;/{this.props.lower_limit}
+            &nbsp;~&nbsp;/{this.props.upper_limit}&nbsp;)
+          </label>
         </div>
         <div className="block">
           <textarea
@@ -13,7 +75,7 @@ class PrefixInput extends React.Component {
             name="prefix_list_input"
             className={
               "textarea" +
-              (this.props.task_arg_validity_map.prefix_list ? "" : " is-danger")
+              (this.props.arg_validity_map.prefix_list ? "" : " is-danger")
             }
             rows="20"
             autoComplete="off"
@@ -32,7 +94,7 @@ class ScannerInput extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">Scanners</label>
+          <label className="title is-6 block">Scanners</label>
         </div>
         <div className="block">
           <textarea
@@ -40,9 +102,7 @@ class ScannerInput extends React.Component {
             name="scanner_list_input"
             className={
               "textarea" +
-              (this.props.task_arg_validity_map.scanner_list
-                ? ""
-                : " is-danger")
+              (this.props.arg_validity_map.scanner_list ? "" : " is-danger")
             }
             rows="20"
             autoComplete="off"
@@ -61,15 +121,18 @@ class RepeatInput extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">Repeat</label>
+          <label className="title is-6 block">Repeat</label>
+          <label className="subtitle is-6 block">
+            &nbsp;(&nbsp;{this.props.lower_limit}&nbsp;~&nbsp;
+            {this.props.upper_limit}&nbsp;)
+          </label>
         </div>
         <div className="block">
           <input
             type="number"
             name="repeat_input"
             className={
-              "input" +
-              (this.props.task_arg_validity_map.repeat ? "" : " is-danger")
+              "input" + (this.props.arg_validity_map.repeat ? "" : " is-danger")
             }
             placeholder="100"
             value={this.props.repeat_input}
@@ -86,9 +149,12 @@ class IntervalInput extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">
+          <label className="title is-6 block">
             Interval
-            <label className="subtitle is-6 block">&nbsp;(Sec)</label>
+            <label className="subtitle is-6 block">
+              &nbsp;(&nbsp;{this.props.lower_limit}s&nbsp;~&nbsp;
+              {this.props.upper_limit}s&nbsp;)
+            </label>
           </label>
         </div>
         <div className="block">
@@ -97,7 +163,7 @@ class IntervalInput extends React.Component {
             name="interval_input"
             className={
               "input" +
-              (this.props.task_arg_validity_map.interval ? "" : " is-danger")
+              (this.props.arg_validity_map.interval ? "" : " is-danger")
             }
             placeholder="60"
             value={this.props.interval_input}
@@ -109,16 +175,16 @@ class IntervalInput extends React.Component {
   }
 }
 
-class InputControl extends React.Component {
+class ScanCreatorControl extends React.Component {
   render() {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">Operation</label>
+          <label className="title is-6 block">Operation</label>
         </div>
         <div className="block">
           <button
-            name="start_button"
+            name="scan_start_button"
             className="button is-info"
             onClick={this.props.handle_click}
           >
@@ -132,48 +198,54 @@ class InputControl extends React.Component {
 
 class ScanCreator extends React.Component {
   render() {
-    if (this.props.ui_mode == "creator") {
+    if (this.props.ui_tab == "scan" && this.props.ui_mode == "creator") {
       return (
         <div className="container">
-          <div className="block pt-5">
+          <div className="block pt-4">
             <div className="columns">
               <div className="column is-half">
                 <ScannerInput
                   handle_change={this.props.handle_change}
                   scanner_list_input={this.props.scanner_list_input}
                   agent_list={this.props.agent_list}
-                  task_arg_validity_map={this.props.task_arg_validity_map}
+                  arg_validity_map={this.props.arg_validity_map}
                 />
               </div>
               <div className="column is-half">
                 <PrefixInput
                   handle_change={this.props.handle_change}
                   prefix_list_input={this.props.prefix_list_input}
-                  task_arg_validity_map={this.props.task_arg_validity_map}
+                  arg_validity_map={this.props.arg_validity_map}
+                  lower_limit={20}
+                  upper_limit={32}
                 />
               </div>
             </div>
           </div>
-          <div className="block pt-5">
+          <div className="block pt-4">
             <div className="columns">
               <div className="column is-one-quarter">
                 <RepeatInput
                   handle_change={this.props.handle_change}
                   repeat_input={this.props.repeat_input}
-                  task_arg_validity_map={this.props.task_arg_validity_map}
+                  arg_validity_map={this.props.arg_validity_map}
+                  lower_limit={1}
+                  upper_limit={100}
                 />
               </div>
               <div className="column is-one-quarter">
                 <IntervalInput
                   handle_change={this.props.handle_change}
                   interval_input={this.props.interval_input}
-                  task_arg_validity_map={this.props.task_arg_validity_map}
+                  arg_validity_map={this.props.arg_validity_map}
+                  lower_limit={30}
+                  upper_limit={300}
                 />
               </div>
             </div>
           </div>
-          <div className="block pt-5">
-            <InputControl handle_click={this.props.handle_click} />
+          <div className="block pt-4">
+            <ScanCreatorControl handle_click={this.props.handle_click} />
           </div>
         </div>
       );
@@ -182,77 +254,103 @@ class ScanCreator extends React.Component {
     }
   }
 }
-
-class RenderControl extends React.Component {
+class IPv4PrefixLenInput extends React.Component {
   render() {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5">Render Control</label>
+          <label className="title is-6 block">IPv4 prefix length</label>
+          <label className="subtitle is-6 block">
+            &nbsp;(&nbsp;{this.props.lower_limit}&nbsp;~&nbsp;
+            {this.props.upper_limit}&nbsp;)
+          </label>
         </div>
-        <div className="columns is-6 is-variable">
-          <div className="column is-one-quarter">
-            <div className="block">
-              <label className="subtitle is-6 block">Render Step</label>
-            </div>
-            <div className="block">
-              <input
-                type="number"
-                name="max_render_step_input"
-                className="input"
-                placeholder="6"
-                max="12"
-                min="3"
-                value={this.props.max_render_step}
-                onChange={this.props.handle_change}
-              ></input>
-            </div>
-          </div>
-          <div className="column is-one-quarter">
-            <div className="block">
-              <label className="subtitle is-6 block">
-                Highlight
-                <label className="subtitle is-6">
-                  &nbsp;(Dead IP increase over)
-                </label>
-              </label>
-            </div>
-            <div className="block">
-              <input
-                type="number"
-                name="highlight_dead_addr_diff_input"
-                className="input"
-                placeholder="4"
-                min="0"
-                value={this.props.highlight_dead_addr_diff}
-                onChange={this.props.handle_change}
-              ></input>
-            </div>
-          </div>
-          <div className="column is-one-quarter">
-            <div className="block">
-              <label className="subtitle is-6 block">
-                Highlight
-                <label className="subtitle is-6">
-                  &nbsp;(Avg. RRT increase over)
-                </label>
-              </label>
-            </div>
-            <div className="block">
-              <input
-                type="number"
-                name="highlight_avg_rrt_diff_input"
-                className="input"
-                placeholder="10"
-                min="0"
-                value={this.props.highlight_avg_rrt_diff}
-                onChange={this.props.handle_change}
-              ></input>
-            </div>
-          </div>
+        <div className="block">
+          <input
+            type="number"
+            name="ipv4_prefix_len_input"
+            className={
+              "input" +
+              (this.props.arg_validity_map.ipv4_prefix_len ? "" : " is-danger")
+            }
+            placeholder="24"
+            value={this.props.ipv4_prefix_len_input}
+            onChange={this.props.handle_change}
+          ></input>
         </div>
       </div>
     );
+  }
+}
+
+class ReduceCreatorControl extends React.Component {
+  render() {
+    return (
+      <div className="block">
+        <div className="block">
+          <label className="title is-6 block">Operation</label>
+        </div>
+        <div className="block">
+          <button
+            name="reduce_start_button"
+            className="button is-info"
+            onClick={this.props.handle_click}
+          >
+            Reduce
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ReduceCreator extends React.Component {
+  render() {
+    if (this.props.ui_tab == "reduce" && this.props.ui_mode == "creator") {
+      return (
+        <div className="container">
+          <div className="block pt-4">
+            <div className="columns">
+              <div className="column is-half">
+                <ScannerInput
+                  handle_change={this.props.handle_change}
+                  scanner_list_input={this.props.scanner_list_input}
+                  agent_list={this.props.agent_list}
+                  arg_validity_map={this.props.arg_validity_map}
+                />
+              </div>
+              <div className="column is-half">
+                <PrefixInput
+                  handle_change={this.props.handle_change}
+                  prefix_list_input={this.props.prefix_list_input}
+                  arg_validity_map={this.props.arg_validity_map}
+                  lower_limit={16}
+                  upper_limit={32}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="block pt-4">
+            <div className="columns">
+              <div className="column is-one-quarter">
+                <IPv4PrefixLenInput
+                  handle_change={this.props.handle_change}
+                  ipv4_prefix_len_input={this.props.ipv4_prefix_len_input}
+                  arg_validity_map={this.props.arg_validity_map}
+                  lower_limit={20}
+                  upper_limit={32}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="block pt-4">
+            <ReduceCreatorControl handle_click={this.props.handle_click} />
+          </div>
+        </div>
+      );
+    } else {
+      return <div></div>;
+    }
   }
 }
 
@@ -306,7 +404,7 @@ class ScannerCanvas extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5">Scanner</label>
+          <label className="title is-6">Scanner</label>
         </div>
         <div className="field is-grouped">
           {Object.keys(this.props.scan_out).map((scanner) => (
@@ -359,7 +457,7 @@ class ScanOutCanvas extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5">Scan Result</label>
+          <label className="title is-6">Scan Result</label>
         </div>
         <div className="block">
           <div className="columns">
@@ -426,7 +524,7 @@ class ScanOutDetailCanvas extends React.Component {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5">Scan Result Detail</label>
+          <label className="title is-6">Scan Result Detail</label>
         </div>
         <div className="block">
           <div className="columns">
@@ -521,24 +619,97 @@ class ScanOutDetailCanvas extends React.Component {
   }
 }
 
-class ScanControl extends React.Component {
+class RenderControl extends React.Component {
   render() {
     return (
       <div className="block">
         <div className="block">
-          <label className="title is-5 block">Operation</label>
+          <label className="title is-6">Render Control</label>
+        </div>
+        <div className="columns is-6 is-variable">
+          <div className="column is-one-quarter">
+            <div className="block">
+              <label className="subtitle is-6 block">Render Step</label>
+            </div>
+            <div className="block">
+              <input
+                type="number"
+                name="max_render_step_input"
+                className="input"
+                placeholder="6"
+                max="12"
+                min="3"
+                value={this.props.max_render_step}
+                onChange={this.props.handle_change}
+              ></input>
+            </div>
+          </div>
+          <div className="column is-one-quarter">
+            <div className="block">
+              <label className="subtitle is-6 block">
+                Highlight
+                <label className="subtitle is-6">
+                  &nbsp;(Dead IP increase over)
+                </label>
+              </label>
+            </div>
+            <div className="block">
+              <input
+                type="number"
+                name="highlight_dead_addr_diff_input"
+                className="input"
+                placeholder="4"
+                min="0"
+                value={this.props.highlight_dead_addr_diff}
+                onChange={this.props.handle_change}
+              ></input>
+            </div>
+          </div>
+          <div className="column is-one-quarter">
+            <div className="block">
+              <label className="subtitle is-6 block">
+                Highlight
+                <label className="subtitle is-6">
+                  &nbsp;(Avg. RRT increase over)
+                </label>
+              </label>
+            </div>
+            <div className="block">
+              <input
+                type="number"
+                name="highlight_avg_rrt_diff_input"
+                className="input"
+                placeholder="10"
+                min="0"
+                value={this.props.highlight_avg_rrt_diff}
+                onChange={this.props.handle_change}
+              ></input>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ScanPainterControl extends React.Component {
+  render() {
+    return (
+      <div className="block">
+        <div className="block">
+          <label className="title is-6 block">Operation</label>
         </div>
         <div className="block">
           <button
             className="button is-info"
-            name="restart_button"
+            name="scan_restart_button"
             onClick={this.props.handle_click}
           >
             Rescan
           </button>
           <button
             className="button is-danger ml-4"
-            name="stop_back_button"
+            name="scan_stop_button"
             onClick={this.props.handle_click}
           >
             Stop & Back
@@ -568,10 +739,10 @@ class ScanPainter extends React.Component {
   }
 
   render() {
-    if (this.props.ui_mode == "painter") {
+    if (this.props.ui_tab == "scan" && this.props.ui_mode == "painter") {
       return (
         <div className="container">
-          <div className="block pt-5">
+          <div className="block pt-4">
             <ScannerCanvas
               handle_click={this.props.handle_click}
               scan_out={this.props.scan_out}
@@ -582,7 +753,7 @@ class ScanPainter extends React.Component {
               gen_render_step_list={this.gen_render_step_list}
             />
           </div>
-          <div className="block pt-5">
+          <div className="block pt-4">
             <ScanOutCanvas
               handle_click={this.props.handle_click}
               scan_out={this.props.scan_out}
@@ -594,7 +765,7 @@ class ScanPainter extends React.Component {
               gen_render_step_list={this.gen_render_step_list}
             />
           </div>
-          <div className="block pt-5">
+          <div className="block pt-4">
             <ScanOutDetailCanvas
               scan_out={this.props.scan_out}
               render_scanner={this.props.render_scanner}
@@ -602,7 +773,7 @@ class ScanPainter extends React.Component {
               render_step={this.props.render_step}
             />
           </div>
-          <div className="block pt-5">
+          <div className="block pt-4">
             <RenderControl
               handle_change={this.props.handle_change}
               max_render_step={this.props.max_render_step}
@@ -610,8 +781,162 @@ class ScanPainter extends React.Component {
               highlight_avg_rrt_diff={this.props.highlight_avg_rrt_diff}
             />
           </div>
-          <div className="block pt-5">
-            <ScanControl handle_click={this.props.handle_click} />
+          <div className="block pt-4">
+            <ScanPainterControl handle_click={this.props.handle_click} />
+          </div>
+        </div>
+      );
+    } else {
+      return <div></div>;
+    }
+  }
+}
+
+class PrefixCanvas extends React.Component {
+  render() {
+    return (
+      <div className="block">
+        <div className="block">
+          <label className="title is-6 block">Scan Networks</label>
+        </div>
+        <div className="block">
+          <textarea
+            type="text"
+            name="prefix_list_canvas"
+            className={"textarea"}
+            readOnly={true}
+            rows="20"
+            autoComplete="off"
+            placeholder="192.168.0.0/24"
+            value={this.props.prefix_list_input.join("\n")}
+          ></textarea>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ReducedPrefixCanvas extends React.Component {
+  render() {
+    let render_scan_out = this.props.scan_out[this.props.render_scanner];
+    return (
+      <div className="block">
+        <div className="block">
+          <label className="title is-6 block">Reduced Scan Networks</label>
+        </div>
+        <div className="block">
+          <div
+            className={
+              this.props.scanner_running_map[this.props.render_scanner]
+                ? "control is-loading"
+                : "control"
+            }
+          >
+            <textarea
+              type="text"
+              name="reduced_prefix_list_canvas"
+              className={"textarea"}
+              readOnly={true}
+              rows="20"
+              autoComplete="off"
+              placeholder="192.168.0.0/24"
+              value={Object.keys(render_scan_out)
+                .map((prefix) =>
+                  render_scan_out[prefix][0]
+                    ? render_scan_out[prefix][0].alive_addr_count
+                      ? prefix
+                      : "# " + prefix
+                    : prefix
+                )
+                .join("\n")}
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ReducePainterControl extends React.Component {
+  render() {
+    return (
+      <div className="block">
+        <div className="block">
+          <label className="title is-6 block">Operation</label>
+        </div>
+        <div className="block">
+          <button
+            className={
+              Object.values(this.props.scanner_running_map).reduce(
+                (all_status, scanner_status) => all_status & scanner_status
+              )
+                ? "button is-info ml-4 is-loading"
+                : "button is-info ml-4"
+            }
+            name="reduce_update_button"
+            onClick={this.props.handle_click}
+          >
+            Update
+          </button>
+          <button
+            className="button is-danger ml-4"
+            name="reduce_stop_button"
+            onClick={this.props.handle_click}
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ReducePainter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.gen_render_step_list = this.gen_render_step_list.bind(this);
+  }
+
+  gen_render_step_list(scanner) {
+    return [0];
+  }
+
+  render() {
+    if (this.props.ui_tab == "reduce" && this.props.ui_mode == "painter") {
+      return (
+        <div className="container">
+          <div className="block pt-4">
+            <ScannerCanvas
+              handle_click={this.props.handle_click}
+              scan_out={this.props.scan_out}
+              render_scanner={this.props.render_scanner}
+              scanner_running_map={this.props.scanner_running_map}
+              highlight_dead_addr_diff={65535}
+              highlight_avg_rrt_diff={1000}
+              gen_render_step_list={this.gen_render_step_list}
+            />
+          </div>
+          <div className="columns">
+            <div className="column is-one-half">
+              <PrefixCanvas
+                handle_change={this.props.handle_change}
+                prefix_list_input={this.props.prefix_list_input}
+              />
+            </div>
+            <div className="column is-one-half">
+              <ReducedPrefixCanvas
+                handle_change={this.props.handle_change}
+                scan_out={this.props.scan_out}
+                render_scanner={this.props.render_scanner}
+                scanner_running_map={this.props.scanner_running_map}
+              />
+            </div>
+          </div>
+          <div className="block pt-4">
+            <ReducePainterControl
+              handle_click={this.props.handle_click}
+              scanner_running_map={this.props.scanner_running_map}
+            />
           </div>
         </div>
       );
@@ -627,31 +952,41 @@ class GlobalScan extends React.Component {
     this.state = {
       agent_list: [],
       ws_protocol: "wss",
+      // creator input
       scanner_list_input: [],
       prefix_list_input: [],
+      // scan creator input
       repeat_input: 10,
-      interval_input: 60,
+      interval_input: 30,
+      // reduce creator input
+      ipv4_prefix_len_input: 24,
+      // task
+      ws: null,
+      repeat: 10,
+      interval: 30,
       scanner_list: [],
       prefix_list: [],
-      repeat: 10,
-      interval: 60,
+      ipv4_prefix_len: 24,
       task_id: "",
-      task_arg_validity_map: {
+      arg_validity_map: {
         prefix_list: true,
         scanner_list: true,
         repeat: true,
         interval: true,
+        ipv4_prefix_len: true,
       },
       scan_out: {},
       latest_scan_step: {},
-      render_scanner: "",
-      render_prefix: "",
-      render_step: "",
       scanner_running_map: {},
+      // scan painter input
       max_render_step: 6,
       highlight_dead_addr_diff: 4,
       highlight_avg_rrt_diff: 10,
-      ws: null,
+      render_scanner: "",
+      render_prefix: "",
+      render_step: "",
+      // ui
+      ui_tab: "scan",
       ui_mode: "creator",
     };
 
@@ -664,33 +999,41 @@ class GlobalScan extends React.Component {
       case "scanner_list_input":
         this.setState({
           scanner_list_input: event.target.value.split("\n"),
-          task_arg_validity_map: this.state.task_arg_validity_map.scanner_list
-            ? this.state.task_arg_validity_map
-            : { ...this.state.task_arg_validity_map, scanner_list: true },
+          arg_validity_map: this.state.arg_validity_map.scanner_list
+            ? this.state.arg_validity_map
+            : { ...this.state.arg_validity_map, scanner_list: true },
         });
         break;
       case "prefix_list_input":
         this.setState({
           prefix_list_input: event.target.value.split("\n"),
-          task_arg_validity_map: this.state.task_arg_validity_map.prefix_list
-            ? this.state.task_arg_validity_map
-            : { ...this.state.task_arg_validity_map, prefix_list: true },
+          arg_validity_map: this.state.arg_validity_map.prefix_list
+            ? this.state.arg_validity_map
+            : { ...this.state.arg_validity_map, prefix_list: true },
         });
         break;
       case "repeat_input":
         this.setState({
           repeat_input: event.target.value,
-          task_arg_validity_map: this.state.task_arg_validity_map.repeat
-            ? this.state.task_arg_validity_map
-            : { ...this.state.task_arg_validity_map, repeat: true },
+          arg_validity_map: this.state.arg_validity_map.repeat
+            ? this.state.arg_validity_map
+            : { ...this.state.arg_validity_map, repeat: true },
         });
         break;
       case "interval_input":
         this.setState({
           interval_input: event.target.value,
-          task_arg_validity_map: this.state.task_arg_validity_map.interval
-            ? this.state.task_arg_validity_map
-            : { ...this.state.task_arg_validity_map, interval: true },
+          arg_validity_map: this.state.arg_validity_map.interval
+            ? this.state.arg_validity_map
+            : { ...this.state.arg_validity_map, interval: true },
+        });
+        break;
+      case "ipv4_prefix_len_input":
+        this.setState({
+          ipv4_prefix_len_input: event.target.value,
+          arg_validity_map: this.state.arg_validity_map.ipv4_prefix_len
+            ? this.state.arg_validity_map
+            : { ...this.state.arg_validity_map, ipv4_prefix_len: true },
         });
         break;
       case "max_render_step_input":
@@ -707,20 +1050,48 @@ class GlobalScan extends React.Component {
 
   handle_click(event) {
     switch (event.currentTarget.getAttribute("name")) {
-      case "start_button":
+      case "scan_start_button":
         this.scan_task();
         break;
-      case "restart_button":
+      case "scan_restart_button":
         if (this.state.ws) {
           this.state.ws.close();
         }
         this.scan_task();
         break;
-      case "stop_back_button":
+      case "scan_stop_button":
         if (this.state.ws) {
           this.state.ws.close();
         }
         this.setState({
+          ui_tab: "scan",
+          ui_mode: "creator",
+        });
+        break;
+      case "reduce_start_button":
+        this.reduce_task();
+        break;
+      case "reduce_update_button":
+        let reduced_prefix_list = [];
+        for (let scanner in this.state.scan_out) {
+          for (let prefix in this.state.scan_out[scanner]) {
+            if (this.state.scan_out[scanner][prefix][0]) {
+              if (this.state.scan_out[scanner][prefix][0].alive_addr_count) {
+                reduced_prefix_list.push(prefix);
+              }
+            }
+          }
+        }
+        this.setState({
+          prefix_list_input: Array.from(new Set(reduced_prefix_list)),
+        });
+        break;
+      case "reduce_stop_button":
+        if (this.state.ws) {
+          this.state.ws.close();
+        }
+        this.setState({
+          ui_tab: "reduce",
           ui_mode: "creator",
         });
         break;
@@ -737,6 +1108,25 @@ class GlobalScan extends React.Component {
           render_step: event.currentTarget.dataset.step,
         });
         break;
+      case "scan_tab":
+        if (this.state.ui_tab != "scan") {
+          this.setState({
+            ui_tab: "scan",
+            ui_mode: "creator",
+          });
+        }
+        break;
+      case "reduce_tab":
+        if (this.state.ui_tab != "reduce") {
+          if (this.state.ws) {
+            this.state.ws.close();
+          }
+          this.setState({
+            ui_tab: "reduce",
+            ui_mode: "creator",
+          });
+          break;
+        }
     }
   }
 
@@ -749,41 +1139,87 @@ class GlobalScan extends React.Component {
       let json_response = await response.json();
       this.setState({
         agent_list: json_response,
-        scanner_list_input: json_response.sort().map((scanner) => "# " + scanner),
+        scanner_list_input: json_response
+          .sort()
+          .map((scanner) => "# " + scanner),
       });
     } catch (error) {
       this.setState({ agent_list: [] });
     }
   }
 
-  proc_scanner_step_out(scanner_step_out) {
-    // console.log(scanner_step_out);
-    let scanner = scanner_step_out.scanner;
-    let step_id = scanner_step_out.step_id;
-    let scan_step_out = scanner_step_out.scan_step_out;
-    if (step_id == 0) {
-      this.setState({ scan_out: { [scanner]: [scan_step_out] } });
-    } else {
-      this.setState({
-        scan_out: {
-          ...this.state.scan_out,
-          [scanner]: [...this.state.scan_out[scanner], scan_step_out],
+  proc_ws_message_arg_error(message) {
+    this.setState({
+      arg_validity_map: {
+        ...this.state.arg_validity_map,
+        ...message.arg_validity_map,
+      },
+    });
+  }
+
+  proc_ws_message_scanner_start(message) {
+    this.setState({
+      scanner_running_map: {
+        ...this.state.scanner_running_map,
+        [message.scanner]: true,
+      },
+    });
+  }
+
+  proc_ws_message_scanner_end(message) {
+    this.setState({
+      scanner_running_map: {
+        ...this.state.scanner_running_map,
+        [message.scanner]: false,
+      },
+    });
+  }
+
+  proc_ws_message_step_end(message) {
+    this.setState({
+      scan_out: {
+        ...this.state.scan_out,
+        [message.scanner]: {
+          ...this.state.scan_out[message.scanner],
+          [message.prefix]: [
+            ...this.state.scan_out[message.scanner][message.prefix],
+            {
+              step: message.step,
+              alive_addr_count: message.alive_addr_count,
+              dead_addr_count: message.dead_addr_count,
+              avg_rrt: message.avg_rrt,
+              alive_addr_diff_list: message.alive_addr_diff_list,
+              dead_addr_diff_list: message.dead_addr_diff_list,
+              avg_rrt_diff: message.avg_rrt_diff,
+            },
+          ],
         },
-      });
-    }
+      },
+      latest_scan_step: {
+        ...this.state.latest_scan_step,
+        [message.scanner]:
+          message.step > this.state.latest_scan_step[message.scanner]
+            ? message.step
+            : this.state.latest_scan_step[message.scanner],
+      },
+    });
   }
 
   scan_task() {
     let task_info = {
-      scanner_list: this.state.scanner_list_input.map((scanner) => scanner.trim()),
+      scanner_list: this.state.scanner_list_input.map((scanner) =>
+        scanner.trim()
+      ),
       prefix_list: this.state.prefix_list_input,
       repeat: Number(this.state.repeat_input),
       interval: Number(this.state.interval_input),
     };
-    let ws = new WebSocket(
-      this.state.ws_protocol + "://" + window.location.host + "/ws/v1/task"
-    );
+
     // console.log(task_info);
+    let ws = new WebSocket(
+      this.state.ws_protocol + "://" + window.location.host + "/ws/v1/scan_task"
+    );
+
     ws.addEventListener("open", () =>
       ws.send(
         JSON.stringify({
@@ -792,9 +1228,10 @@ class GlobalScan extends React.Component {
         })
       )
     );
+
     ws.addEventListener("message", (event) => {
-      // console.log(event.data);
       let message = JSON.parse(event.data);
+      // console.log(message);
       switch (message.event) {
         case "task_start":
           this.setState({
@@ -820,67 +1257,111 @@ class GlobalScan extends React.Component {
             scanner_running_map: Object.fromEntries(
               message.scanner_list.map((scanner) => [scanner, false])
             ),
-            ws: ws,
             ui_mode: "painter",
           });
           break;
         case "task_arg_error":
-          this.setState({
-            task_arg_validity_map: message.task_arg_validity_map,
-          });
+          this.proc_ws_message_arg_error(message);
           break;
         case "scanner_start":
-          this.setState({
-            scanner_running_map: {
-              ...this.state.scanner_running_map,
-              [message.scanner]: true,
-            },
-          });
+          this.proc_ws_message_scanner_start(message);
           break;
         case "scanner_end":
-          this.setState({
-            scanner_running_map: {
-              ...this.state.scanner_running_map,
-              [message.scanner]: false,
-            },
-          });
+          this.proc_ws_message_scanner_end(message);
           break;
         case "step_end":
-          this.setState({
-            scan_out: {
-              ...this.state.scan_out,
-              [message.scanner]: {
-                ...this.state.scan_out[message.scanner],
-                [message.prefix]: [
-                  ...this.state.scan_out[message.scanner][message.prefix],
-                  {
-                    step: message.step,
-                    alive_addr_count: message.alive_addr_count,
-                    dead_addr_count: message.dead_addr_count,
-                    avg_rrt: message.avg_rrt,
-                    alive_addr_diff_list: message.alive_addr_diff_list,
-                    dead_addr_diff_list: message.dead_addr_diff_list,
-                    avg_rrt_diff: message.avg_rrt_diff,
-                  },
-                ],
-              },
-            },
-            latest_scan_step: {
-              ...this.state.latest_scan_step,
-              [message.scanner]:
-                message.step > this.state.latest_scan_step[message.scanner]
-                  ? message.step
-                  : this.state.latest_scan_step[message.scanner],
-            },
-          });
+          this.proc_ws_message_step_end(message);
           break;
       }
+    });
+
+    this.setState({
+      ws: ws,
+    });
+  }
+
+  reduce_task() {
+    let task_info = {
+      scanner_list: this.state.scanner_list_input.map((scanner) =>
+        scanner.trim()
+      ),
+      prefix_list: this.state.prefix_list_input,
+      ipv4_prefix_len: Number(this.state.ipv4_prefix_len_input),
+    };
+
+    let ws = new WebSocket(
+      this.state.ws_protocol +
+        "://" +
+        window.location.host +
+        "/ws/v1/reduce_task"
+    );
+
+    // console.log(task_info);
+    ws.addEventListener("open", () =>
+      ws.send(
+        JSON.stringify({
+          event: "task_request",
+          ...task_info,
+        })
+      )
+    );
+
+    ws.addEventListener("message", (event) => {
+      let message = JSON.parse(event.data);
+      // console.log(message);
+      switch (message.event) {
+        case "task_start":
+          this.setState({
+            scanner_list: message.scanner_list,
+            prefix_list: message.prefix_list,
+            task_id: message.task_id,
+            scan_out: Object.fromEntries(
+              message.scanner_list.map((scanner) => [
+                scanner,
+                Object.fromEntries(
+                  message.prefix_list.map((prefix) => [prefix, []])
+                ),
+              ])
+            ),
+            latest_scan_step: Object.fromEntries(
+              message.scanner_list.map((scanner) => [scanner, 0])
+            ),
+            render_scanner: message.scanner_list[0],
+            scanner_running_map: Object.fromEntries(
+              message.scanner_list.map((scanner) => [scanner, false])
+            ),
+            ui_mode: "painter",
+          });
+          break;
+        case "task_arg_error":
+          this.proc_ws_message_arg_error(message);
+          break;
+        case "scanner_start":
+          this.proc_ws_message_scanner_start(message);
+          break;
+        case "scanner_end":
+          this.proc_ws_message_scanner_end(message);
+          break;
+        case "step_end":
+          this.proc_ws_message_step_end(message);
+          break;
+      }
+    });
+
+    this.setState({
+      ws: ws,
     });
   }
 
   render() {
     return (
-      <div className="block">
+      <div>
+        <NavBar />
+        <TabBar
+          handle_click={this.handle_click}
+          ui_tab={this.state.ui_tab}
+          ui_mode={this.state.ui_mode}
+        />
         <ScanCreator
           handle_change={this.handle_change}
           handle_click={this.handle_click}
@@ -889,7 +1370,19 @@ class GlobalScan extends React.Component {
           repeat_input={this.state.repeat_input}
           interval_input={this.state.interval_input}
           agent_list={this.state.agent_list}
-          task_arg_validity_map={this.state.task_arg_validity_map}
+          arg_validity_map={this.state.arg_validity_map}
+          ui_tab={this.state.ui_tab}
+          ui_mode={this.state.ui_mode}
+        />
+        <ReduceCreator
+          handle_change={this.handle_change}
+          handle_click={this.handle_click}
+          scanner_list_input={this.state.scanner_list_input}
+          prefix_list_input={this.state.prefix_list_input}
+          ipv4_prefix_len_input={this.state.ipv4_prefix_len_input}
+          agent_list={this.state.agent_list}
+          arg_validity_map={this.state.arg_validity_map}
+          ui_tab={this.state.ui_tab}
           ui_mode={this.state.ui_mode}
         />
         <ScanPainter
@@ -904,6 +1397,17 @@ class GlobalScan extends React.Component {
           max_render_step={this.state.max_render_step}
           highlight_dead_addr_diff={this.state.highlight_dead_addr_diff}
           highlight_avg_rrt_diff={this.state.highlight_avg_rrt_diff}
+          ui_tab={this.state.ui_tab}
+          ui_mode={this.state.ui_mode}
+        />
+        <ReducePainter
+          handle_change={this.handle_change}
+          handle_click={this.handle_click}
+          prefix_list_input={this.state.prefix_list_input}
+          scan_out={this.state.scan_out}
+          render_scanner={this.state.render_scanner}
+          scanner_running_map={this.state.scanner_running_map}
+          ui_tab={this.state.ui_tab}
           ui_mode={this.state.ui_mode}
         />
       </div>

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-
-# tcneko <tcneko@outlook.com>
-# create: 2021.10
-# last update:
+# author: tcneko <tcneko@outlook.com>
+# start from: 2021.10
 # last test environment: ubuntu 20.04
 # description:
 
@@ -14,6 +12,7 @@ import asyncio
 import ipaddress
 import json
 import os
+import random
 import re
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -34,6 +33,9 @@ if enable_tls == "True":
     http_protocol = "https"
 else:
     http_protocol = "http"
+
+random_delay_limit = int(os.environ.get(
+    "GLOBAL_SCAN_RANDOM_DELAY_LIMIT") or "3")
 
 agent_exist_url = "{}://{}:{}/api/v1/agent_exist".format(
     http_protocol, core_hostname, core_port)
@@ -73,7 +75,8 @@ async def fping(prefix: str):
 
 
 async def scan_step(task_id: str, prefix: str, step: int, interval: int, ws: WebSocket):
-    await asyncio.sleep(interval * step)
+    random_delay = random.randint(0, random_delay_limit)
+    await asyncio.sleep(interval * step + random_delay)
     if ws.client_state.name != "CONNECTED":
         raise WebSocketDisconnect
     scan_step_out = await fping(prefix)
@@ -172,7 +175,7 @@ async def dump_env():
     print(json.dumps(json_msg))
 
 
-@app.websocket("/ws/v1/task")
+@app.websocket("/ws/v1/scan_task")
 async def ws_task(ws: WebSocket):
     await ws.accept()
     aio_task_map = {}
