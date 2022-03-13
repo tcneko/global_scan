@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  global_scan_core_frontend:
+    image: "global_scan_core_frontend:1.0.0"
+    network_mode: "host"
+    restart: "always"
+    environment:
+      - "TZ={{time_zone}}"

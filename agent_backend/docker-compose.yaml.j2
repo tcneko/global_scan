@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  global_scan_agent_backend:
+    image: "global_scan_agent_backend:1.0.0"
+    network_mode: "host"
+    restart: "always"
+    environment:
+      - "TZ={{time_zone}}"
+      - "PYTHONUNBUFFERED=1"
+      - "GLOBAL_SCAN_AGENT_ALIAS={{agent_hostname_alias}}"
+      - "GLOBAL_SCAN_AGENT_HOSTNAME={{agent_hostname}}"
+      - "GLOBAL_SCAN_AGENT_PORT={{agent_port}}"
+      - "GLOBAL_SCAN_CORE_HOSTNAME={{core_hostname}}"
+      - "GLOBAL_SCAN_CORE_PORT={{core_port}}"
+      - "GLOBAL_SCAN_ENABLE_TLS=False"
+    command:
+      - "--host"
+      - "{{agent_backend_listen_addr}}"
+      - "--port"
+      - "{{agent_backend_listen_port}}"

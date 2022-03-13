@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  global_scan_core_backend:
+    image: "global_scan_core_backend:1.0.0"
+    network_mode: "host"
+    restart: "always"
+    environment:
+      - "TZ={{time_zone}}"
+      - "PYTHONUNBUFFERED=1"
+      - "GLOBAL_SCAN_ENABLE_TLS=False"
+    command:
+      - "--host"
+      - "{{core_backend_listen_addr}}"
+      - "--port"
+      - "{{core_backend_listen_port}}"

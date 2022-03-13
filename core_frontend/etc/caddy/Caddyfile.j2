@@ -2,7 +2,7 @@
   admin off
 }
 
-:5917 {
+{{core_frontend_listen_addr}}:{{core_frontend_listen_port}} {
   rewrite /favicon.ico /static/favicon.ico
   file_server * {
     root /root/global_scan
